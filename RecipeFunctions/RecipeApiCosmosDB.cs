@@ -78,18 +78,18 @@ namespace RecipeFunctions
         [FunctionName("GetRecipeById")]
         public static IActionResult GetRecipeById(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = Route + "/{id}")] HttpRequest req,
-            [CosmosDB(DatabaseName, CollectionName, ConnectionStringSetting = "CosmosDBConnection",
-                Id = "{id}")] Recipe recipe,
+            [CosmosDB(ConnectionStringSetting = "CosmosDBConnection")] DocumentClient client,
             ILogger log, string id)
         {
-            log.LogInformation("Getting recipe item by id");
-
-            if (recipe == null)
+            var option = new FeedOptions { EnableCrossPartitionQuery = true };
+            Uri collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
+            var document = client.CreateDocumentQuery(collectionUri, option).Where(t => t.Id == id)
+                    .AsEnumerable().FirstOrDefault();
+            if (document == null)
             {
-                log.LogInformation($"Item {id} not found");
                 return new NotFoundResult();
             }
-            return new OkObjectResult(recipe);
+            return new OkObjectResult(document);
         }
 
         [FunctionName("UpdateRecipe")]
@@ -101,8 +101,9 @@ namespace RecipeFunctions
         {
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var updated = JsonConvert.DeserializeObject<Recipe>(requestBody);
+            var option = new FeedOptions { EnableCrossPartitionQuery = true };
             Uri collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
-            var document = client.CreateDocumentQuery(collectionUri).Where(t => t.Id == id)
+            var document = client.CreateDocumentQuery(collectionUri, option).Where(t => t.Id == id)
                             .AsEnumerable().FirstOrDefault();
             if (document == null)
             {
@@ -129,8 +130,9 @@ namespace RecipeFunctions
             [CosmosDB(ConnectionStringSetting = "CosmosDBConnection")] DocumentClient client,
             ILogger log, string id)
         {
+            var option = new FeedOptions { EnableCrossPartitionQuery = true };
             Uri collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
-            var document = client.CreateDocumentQuery(collectionUri).Where(t => t.Id == id)
+            var document = client.CreateDocumentQuery(collectionUri, option).Where(t => t.Id == id)
                     .AsEnumerable().FirstOrDefault();
             if (document == null)
             {
