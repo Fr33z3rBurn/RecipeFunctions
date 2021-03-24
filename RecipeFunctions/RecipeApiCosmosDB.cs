@@ -33,6 +33,7 @@ namespace RecipeFunctions
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             var input = JsonConvert.DeserializeObject<Recipe>(requestBody);
 
+            //TODO Mapper
             var recipe = new Recipe() 
             {
                 RecipeName = input.RecipeName, 
@@ -108,24 +109,15 @@ namespace RecipeFunctions
                 return new NotFoundResult();
             }
 
-            //TODO Update
-            //document.SetPropertyValue("IsCompleted", updated.IsCompleted);
-            //if (!string.IsNullOrEmpty(updated.TaskDescription))
-            //{
-            //    document.SetPropertyValue("TaskDescription", updated.TaskDescription);
-            //}
+			//TODO Update
+			document.SetPropertyValue("RecipeName", updated.RecipeName);
+			if (!string.IsNullOrEmpty(updated.Creator))
+			{
+				document.SetPropertyValue("Creator", updated.Creator);
+			}
 
-            await client.ReplaceDocumentAsync(document);
+			await client.ReplaceDocumentAsync(document);
 
-            /* var todo = new Todo()
-            {
-                Id = document.GetPropertyValue<string>("id"),
-                CreatedTime = document.GetPropertyValue<DateTime>("CreatedTime"),
-                TaskDescription = document.GetPropertyValue<string>("TaskDescription"),
-                IsCompleted = document.GetPropertyValue<bool>("IsCompleted")
-            };*/
-
-            // an easier way to deserialize a Document
             Recipe recipe = (dynamic)document;
 
             return new OkObjectResult(recipe);
