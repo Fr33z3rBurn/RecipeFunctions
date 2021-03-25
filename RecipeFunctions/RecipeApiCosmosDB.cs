@@ -92,6 +92,40 @@ namespace RecipeFunctions
             return new OkObjectResult(document);
         }
 
+        [FunctionName("GetRecipeByName")]
+        public static IActionResult GetRecipeByName(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = Route + "/name/{name}")] HttpRequest req,
+            [CosmosDB(ConnectionStringSetting = "CosmosDBConnection")] DocumentClient client,
+            ILogger log, string name)
+        {
+            var option = new FeedOptions { EnableCrossPartitionQuery = true };
+            Uri collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
+            var document = client.CreateDocumentQuery<Recipe>(collectionUri, option).Where(t => t.RecipeName == name)
+                    .AsEnumerable().FirstOrDefault();
+            if (document == null)
+            {
+                return new NotFoundResult();
+            }
+            return new OkObjectResult(document);
+        }
+
+        [FunctionName("SearchRecipesByName")]
+        public static IActionResult SearchRecipesByName(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = Route + "/search/{name}")] HttpRequest req,
+            [CosmosDB(ConnectionStringSetting = "CosmosDBConnection")] DocumentClient client,
+            ILogger log, string name)
+        {
+            var option = new FeedOptions { EnableCrossPartitionQuery = true };
+            Uri collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
+            var document = client.CreateDocumentQuery<Recipe>(collectionUri, option).Where(t => t.RecipeName.Contains(name))
+                    .AsEnumerable();
+            if (document == null)
+            {
+                return new NotFoundResult();
+            }
+            return new OkObjectResult(document);
+        }
+
         [FunctionName("UpdateRecipe")]
         public static async Task<IActionResult> UpdateRecipe(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = Route + "/{id}")] HttpRequest req,
