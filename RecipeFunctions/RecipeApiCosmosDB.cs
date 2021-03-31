@@ -175,6 +175,29 @@ namespace RecipeFunctions
             await client.DeleteDocumentAsync(document.SelfLink);
             return new OkResult();
         }
+
+        [FunctionName("GetRandomRecipe")]
+        public static IActionResult GetRandomRecipe(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = Route + "/random")] HttpRequest req,
+            [CosmosDB(
+                DatabaseName,
+                CollectionName,
+                ConnectionStringSetting = "CosmosDBConnection",
+                SqlQuery = "SELECT * FROM c order by c._ts desc")]
+                IEnumerable<Recipe> recipes,
+            ILogger log)
+        {
+            log.LogInformation("Getting recipe list items");
+            
+            if(recipes != null && recipes.Count() > 0)
+			{
+                Random random = new Random();
+                int randomRecipeNumber = random.Next(0, recipes.Count() - 1);
+                return new OkObjectResult(recipes.ToList()[randomRecipeNumber]);
+			}
+            return new NotFoundResult();
+            
+        }
     }
 }
 
