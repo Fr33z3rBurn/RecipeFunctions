@@ -11,6 +11,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.Azure.Documents;
 
 namespace RecipeFunctions
 {
@@ -145,16 +146,12 @@ namespace RecipeFunctions
             [CosmosDB(ConnectionStringSetting = "CosmosDBConnection")] DocumentClient client,
             ILogger log, string id)
         {
-            var option = new FeedOptions { EnableCrossPartitionQuery = true };
-            Uri collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
-            var document = client.CreateDocumentQuery(collectionUri, option).Where(t => t.Id == id)
-                    .AsEnumerable().FirstOrDefault();
-            if (document == null)
-            {
-                return new NotFoundResult();
-            }
-            await client.DeleteDocumentAsync(document.SelfLink);
-            return new OkResult();
+            ResourceResponse<Document> response = await client.DeleteDocumentAsync(
+                UriFactory.CreateDocumentUri(DatabaseName, CollectionName, id),
+                new RequestOptions { PartitionKey = new PartitionKey(Undefined.Value) });
+
+            //TODO Make Conditional
+            return new NoContentResult();
         }
     }
 }
