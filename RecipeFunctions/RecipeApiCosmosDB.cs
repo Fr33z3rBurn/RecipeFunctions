@@ -117,7 +117,7 @@ namespace RecipeFunctions
         {
             var option = new FeedOptions { EnableCrossPartitionQuery = true };
             Uri collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
-            var document = client.CreateDocumentQuery<Recipe>(collectionUri, option).Where(t => t.RecipeName.Contains(name))
+            var document = client.CreateDocumentQuery<Recipe>(collectionUri, option).Where(t => t.RecipeName.ToLower().Contains(name.ToLower()))
                     .AsEnumerable();
             if (document == null)
             {
