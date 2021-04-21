@@ -7,7 +7,9 @@ namespace RecipeFunctions.Models
 	public class Recipe
 	{
 		public string Id { get; set; } = Guid.NewGuid().ToString("n");
+		public string CollectionId { get; set; }
 		public string RecipeName { get; set; }
+		public string RecipeNationality { get; set; }
 		public List<Ingredient> Ingredients { get; set; }
 		public List<Step> Steps { get; set; }
 		public int PrepTimeMinutes { get; set; }
