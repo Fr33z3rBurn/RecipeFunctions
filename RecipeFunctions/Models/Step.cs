@@ -2,7 +2,7 @@
 {
 	public class Step
 	{
-		public int Order { get; set; }
-		public string Instructions { get; set; }
+		public int Id { get; set; }
+		public string Directions { get; set; }
 	}
 }
