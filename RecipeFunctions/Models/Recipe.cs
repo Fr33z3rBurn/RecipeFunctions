@@ -19,6 +19,8 @@ namespace RecipeFunctions.Models
 		public int ReadyInMinutes { get; set; }
 		public string Creator { get; set; }
 		public string Notes { get; set; }
+		public string OriginalSource { get; set; }
+		public string ApprovalStatus { get; set; }
 
 		//TODO Pictures
 	}
