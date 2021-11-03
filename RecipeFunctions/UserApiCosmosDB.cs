@@ -44,7 +44,7 @@ namespace RecipeFunctions
 			{
 				FirstName = input.FirstName,
 				LastName = input.LastName,
-				UserName = input.UserName,
+				Email = input.Email,
 				Password = input.Password
 			};
 
@@ -62,7 +62,7 @@ namespace RecipeFunctions
 			{
 				FirstName = input.FirstName,
 				LastName = input.LastName,
-				UserName = input.UserName,
+				Email = input.Email,
 				PasswordSalt = passwordSalt,
 				PasswordHash = passwordHash
 			});
@@ -84,14 +84,14 @@ namespace RecipeFunctions
 			//TODO Mapper
 			var user = new AuthenticateModel()
 			{
-				UserName = input.UserName,
+				Email = input.Email,
 				Password = input.Password
 			};
 
 			//get user
 			var option = new FeedOptions { EnableCrossPartitionQuery = true };
 			Uri collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
-			var recipeUser = client.CreateDocumentQuery<RecipeUser>(collectionUri, option).Where(t => t.UserName == input.UserName)
+			var recipeUser = client.CreateDocumentQuery<RecipeUser>(collectionUri, option).Where(t => t.Email == input.Email)
 					.AsEnumerable().FirstOrDefault();
 
 			bool passwordCorrect = true;
@@ -128,7 +128,7 @@ namespace RecipeFunctions
 				return new OkObjectResult(new
 				{
 					Id = recipeUser.Id,
-					Username = recipeUser.UserName,
+					Email = recipeUser.Email,
 					FirstName = recipeUser.FirstName,
 					LastName = recipeUser.LastName,
 					Token = tokenString
